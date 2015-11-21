@@ -76,6 +76,7 @@ void create_image_hdu(const string &hdu_name, const string &column, fitsfile *fp
     /* Check that we've changed hdu */
     int hdunum = 0;
     fits_checkp(fits_get_hdu_num(fptr, &hdunum));
+    assert(1 != hdunum);
 
     cout << "Writing hdu name" << endl;
     char *extname = const_cast<char*>(hdu_name.c_str());
