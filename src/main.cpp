@@ -57,6 +57,7 @@ vector<double> get_column(const string &filename, const string &column, int data
 }
 
 void create_image_hdu(const string &hdu_name, const string &column, fitsfile *fptr, int datatype, const vector<string> &files, long nobjects, long nimages, int *status) {
+    cout << "Creating " << hdu_name << " hdu, from column " << column << endl;
     long naxes[] = {nimages, nobjects};
 
     switch (datatype) {
@@ -76,11 +77,13 @@ void create_image_hdu(const string &hdu_name, const string &column, fitsfile *fp
     int hdunum = 0;
     fits_checkp(fits_get_hdu_num(fptr, &hdunum));
 
+    cout << "Writing hdu name" << endl;
     char *extname = const_cast<char*>(hdu_name.c_str());
     fits_checkp(fits_update_key(fptr, TSTRING, "EXTNAME", extname, NULL, status));
 
     for (int i=0; i<nobjects; i++) {
         auto filename = files[i];
+        cout << "Updating from file " << filename << endl;
         auto data = get_column(filename, column, datatype, status);
         for (int j=data.size(); j<nimages; j++) {
             data.push_back(NULL_VALUE);
@@ -120,9 +123,10 @@ void combine_files(const vector<string> &files, const string &output) {
     assert(nullptr != fptr);
 
     /* Create the primary hdu */
+    cout << "Creating primary hdu" << endl;
     fits_check(fits_create_img(fptr, BYTE_IMG, 0, NULL, &status));
 
-    /* Write the HDUS */
+    /* Write the image HDUS */
     fits_check(create_image_hdu("HJD", "TIME", fptr, TDOUBLE, files, nobjects, nimages, &status));
     fits_check(create_image_hdu("FLUX", "DETFLUX", fptr, TDOUBLE, files, nobjects, nimages, &status));
     fits_check(create_image_hdu("FLUXERR", "DETFLUX_ERR", fptr, TDOUBLE, files, nobjects, nimages, &status));
