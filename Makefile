@@ -1,9 +1,13 @@
 CXX=g++
+OUTDIR ?= bin
 
-all: extract
+all: $(OUTDIR)/extract
 
-extract: src/extract.cpp
+$(OUTDIR)/extract: src/extract.cpp $(OUTDIR)
 	$(CXX) -std=c++11 $< -o $@ $(shell pkg-config --cflags --libs cfitsio) $(shell pkg-config --cflags tclap) -Wall -Wextra -g -O2
 
+$(OUTDIR):
+	mkdir -p $(OUTDIR)
+
 clean:
-	@rm extract
+	@rm $(OUTDIR)/extract
